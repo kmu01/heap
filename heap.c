@@ -110,4 +110,8 @@ void *heap_ver_max(const heap_t *heap);
 void *heap_desencolar(heap_t *heap);
 
 
+<<<<<<< HEAD
 void pruebas_heap_estudiante(void);
+=======
+void pruebas_heap_estudiante(void);
+>>>>>>> bb296560d7ed73893fed581c3ccec9f0d6b673d0
