@@ -1,88 +1,270 @@
-#ifndef HEAP_H
-#define HEAP_H
-
+#include <stdio.h>
+#include <stdlib.h>   // malloc
 #include <stdbool.h>  // bool
 #include <stddef.h>   // size_t
+#include <string.h>   // strcmp
+#include "heap.h"
+#include "testing.h"
 
-/* Prototipo de función de comparación que se le pasa como parámetro a las
- * diversas funciones del heap.
- * Debe recibir dos punteros del tipo de dato utilizado en el heap, y
- * debe devolver:
- *   menor a 0  si  a < b
- *       0      si  a == b
- *   mayor a 0  si  a > b
- */
-typedef int (*cmp_func_t)(const void *a, const void *b);
+/* Funciones de comparacion */
+int comparar_enteros (const void* a , const void* b){
+    int numero_a = *(int*)a;
+    int numero_b = *(int*)b;
+    if (numero_a < numero_b){
+        return -1;
+    }
+    else if (numero_a > numero_b){
+        return 1;
+    }
+    return 0;
+}
+
+int comparar_cadenas (const void* a , const void* b){
+    char* cadena_a = (char*)a;
+    char* cadena_b = (char*)b;
+    return (strcmp(cadena_a,cadena_b));
+}
+
+/* Funciones de pruebas */
+static void prueba_heap_vacio (void){
+    printf ("\nINICIO DE PRUEBAS HEAP VACIO\n");
+    /* Defino los recursos a utilizar */
+    heap_t* heap = heap_crear (comparar_enteros);
+
+    /* Inicio pruebas */
+    print_test ("El heap esta vacio" , heap_esta_vacio(heap));
+    print_test ("La cantidad es 0" , heap_cantidad(heap)==0);
+    print_test ("Obtener max heap vacio" , heap_ver_max(heap)==NULL);
+    print_test ("Desencolar heap vacio" , heap_desencolar(heap)==NULL);
+
+    /* Destruyo el heap */
+    heap_destruir (heap , NULL);
+    printf ("El heap fue destruido\n");
+}
+
+static void prueba_heap_encolar_en_orden (void){
+    printf ("\nINICIO DE PRUEBAS HEAP ENCOLAR EN ORDEN\n");
+    /* Defino los recursos a utilizar */
+    heap_t* heap = heap_crear (comparar_enteros);
+    int numero1 = 0; int* numero_1 = &numero1;
+    int numero2 = 1; int* numero_2 = &numero2;
+    int numero3 = 2; int* numero_3 = &numero3;
+    int numero4 = 3; int* numero_4 = &numero4;
+    int numero5 = 4; int* numero_5 = &numero5;
+    int numero6 = 5; int* numero_6 = &numero6;
+
+    /* Inicio de pruebas */
+    print_test ("El heap esa vacio" , heap_esta_vacio(heap));
+    print_test ("Encolo elemento 1" , heap_encolar (heap , numero_1));
+    print_test ("Verifico que no está vacio" , !heap_esta_vacio(heap));
+    print_test ("Verifico la cantidad" , heap_cantidad(heap)==1);
+    print_test ("Verifico maximo elemento" , heap_ver_max (heap) == numero_1);
+    print_test ("Encolo elemento 2" , heap_encolar (heap , numero_2));
+    print_test ("Verifico la cantidad" , heap_cantidad(heap)==2);
+    print_test ("Verifico maximo elemento" , heap_ver_max (heap) == numero_2);
+    print_test ("Encolo elemento 3" , heap_encolar (heap , numero_3));
+    print_test ("Verifico la cantidad" , heap_cantidad(heap)==3);
+    print_test ("Verifico maximo elemento" , heap_ver_max (heap) == numero_3);
+    print_test ("Encolo elemento 4" , heap_encolar (heap , numero_4));
+    print_test ("Verifico la cantidad" , heap_cantidad(heap)==4);
+    print_test ("Verifico maximo elemento" , heap_ver_max (heap) == numero_4);
+    print_test ("Encolo elemento 5" , heap_encolar (heap , numero_5));
+    print_test ("Verifico la cantidad" , heap_cantidad(heap)==5);
+    print_test ("Verifico maximo elemento" , heap_ver_max (heap) == numero_5);
+    print_test ("Encolo elemento 6" , heap_encolar (heap , numero_6));
+    print_test ("Verifico la cantidad" , heap_cantidad(heap)==6);
+    print_test ("Verifico maximo elemento" , heap_ver_max (heap) == numero_6);
+
+    /* Destruyo el heap */
+    heap_destruir (heap , NULL);
+    printf ("El heap fue destruido\n");
+}
+
+static void prueba_heap_encolar_desordenado (void){
+    printf ("\nINICIO DE PRUEBAS HEAP ENCOLAR DESORDENADO\n");
+    /* Defino los recursos a utilizar */
+    heap_t* heap = heap_crear (comparar_enteros);
+    int numero1 = 0; int* numero_1 = &numero1;
+    int numero2 = 1; int* numero_2 = &numero2;
+    int numero3 = 2; int* numero_3 = &numero3;
+    int numero4 = 3; int* numero_4 = &numero4;
+    int numero5 = 4; int* numero_5 = &numero5;
+    int numero6 = 5; int* numero_6 = &numero6;
 
 
-/* Función de heapsort genérica. Esta función ordena mediante heap_sort
- * un arreglo de punteros opacos, para lo cual requiere que se
- * le pase una función de comparación. Modifica el arreglo "in-place".
- * Nótese que esta función NO es formalmente parte del TAD Heap.
- */
-void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp);
+    /* Inicio de pruebas */
+    print_test ("El heap esa vacio" , heap_esta_vacio(heap));
+    print_test ("Encolo elemento 1" , heap_encolar (heap , numero_3));
+    print_test ("Verifico que no está vacio" , !heap_esta_vacio(heap));
+    print_test ("Verifico la cantidad" , heap_cantidad(heap)==1);
+    print_test ("Verifico maximo elemento" , heap_ver_max (heap) == numero_3);
+    print_test ("Encolo elemento 2" , heap_encolar (heap , numero_1));
+    print_test ("Verifico la cantidad" , heap_cantidad(heap)==2);
+    print_test ("Verifico maximo elemento" , heap_ver_max (heap) == numero_3);
+    print_test ("Encolo elemento 3" , heap_encolar (heap , numero_5));
+    print_test ("Verifico la cantidad" , heap_cantidad(heap)==3);
+    print_test ("Verifico maximo elemento" , heap_ver_max (heap) == numero_5);
+    print_test ("Encolo elemento 4" , heap_encolar (heap , numero_4));
+    print_test ("Verifico la cantidad" , heap_cantidad(heap)==4);
+    print_test ("Verifico maximo elemento" , heap_ver_max (heap) == numero_5);
+    print_test ("Encolo elemento 5" , heap_encolar (heap , numero_2));
+    print_test ("Verifico la cantidad" , heap_cantidad(heap)==5);
+    print_test ("Verifico maximo elemento" , heap_ver_max (heap) == numero_5);
+    print_test ("Encolo elemento 6" , heap_encolar (heap , numero_6));
+    print_test ("Verifico la cantidad" , heap_cantidad(heap)==6);
+    print_test ("Verifico maximo elemento" , heap_ver_max (heap) == numero_6);
 
-/*
- * Implementación de un TAD cola de prioridad, usando un max-heap.
- *
- * Notar que al ser un max-heap el elemento mas grande será el de mejor
- * prioridad. Si se desea un min-heap, alcanza con invertir la función de
- * comparación.
- */
+    /* Destruyo el heap */
+    heap_destruir (heap , NULL);
+    printf ("El heap fue destruido\n");
+}
 
-/* Tipo utilizado para el heap. */
-typedef struct heap heap_t;
+static void prueba_heap_desencolar (void){
+    printf ("\nINICIO DE PRUEBAS HEAP DESENCOLAR\n");
+    /* Defino los recursos a utilizar */
+    heap_t* heap = heap_crear (comparar_enteros);
+    int numero1 = 0; int* numero_1 = &numero1;
+    int numero2 = 1; int* numero_2 = &numero2;
+    int numero3 = 2; int* numero_3 = &numero3;
+    int numero4 = 3; int* numero_4 = &numero4;
+    int numero5 = 4; int* numero_5 = &numero5;
+    int numero6 = 5; int* numero_6 = &numero6;
 
-/* Crea un heap. Recibe como único parámetro la función de comparación a
- * utilizar. Devuelve un puntero al heap, el cual debe ser destruido con
- * heap_destruir().
- */
-heap_t *heap_crear(cmp_func_t cmp);
+    
+    /* Inicio de pruebas */
+    print_test ("Heap vacio" , heap_esta_vacio(heap));
+    print_test ("Encolar elemento 1" , heap_encolar(heap , numero_3));
+    print_test ("Encolar elemento 2" , heap_encolar(heap , numero_2));
+    print_test ("Encolar elemento 3" , heap_encolar(heap , numero_5));
+    print_test ("Encolar elemento 4" , heap_encolar(heap , numero_1));
+    print_test ("Encolar elemento 5" , heap_encolar(heap , numero_4));
+    print_test ("Encolar elemento 6" , heap_encolar(heap , numero_6));
 
-/*
- * Constructor alternativo del heap. Además de la función de comparación,
- * recibe un arreglo de valores con que inicializar el heap. Complejidad
- * O(n).
- *
- * Excepto por la complejidad, es equivalente a crear un heap vacío y encolar
- * los valores de uno en uno
-*/
-heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp);
+    print_test ("Verifico cantidad" , heap_cantidad (heap)==6);
 
-/* Elimina el heap, llamando a la función dada para cada elemento del mismo.
- * El puntero a la función puede ser NULL, en cuyo caso no se llamará.
- * Post: se llamó a la función indicada con cada elemento del heap. El heap
- * dejó de ser válido. */
-void heap_destruir(heap_t *heap, void (*destruir_elemento)(void *e));
+    print_test ("Desencolar" , heap_desencolar (heap)==numero_6);
+    print_test ("Verifico cantidad" , heap_cantidad(heap)==5);
+    print_test ("Desencolar" , heap_desencolar (heap)==numero_5);
+    print_test ("Verifico cantidad" , heap_cantidad(heap)==4);
+    print_test ("Desencolar" , heap_desencolar (heap)==numero_4);
+    print_test ("Verifico cantidad" , heap_cantidad(heap)==3);
+    print_test ("Desencolar" , heap_desencolar (heap)==numero_3);
+    print_test ("Verifico cantidad" , heap_cantidad(heap)==2);
+    print_test ("Desencolar" , heap_desencolar (heap)==numero_2);
+    print_test ("Verifico cantidad" , heap_cantidad(heap)==1);
+    print_test ("Desencolar" , heap_desencolar (heap)==numero_1);
+    print_test ("Verifico que está vacio" , heap_esta_vacio(heap));
+    print_test ("Verifico que no puedo desencolar" , heap_desencolar(heap)==NULL);
 
-/* Devuelve la cantidad de elementos que hay en el heap. */
-size_t heap_cantidad(const heap_t *heap);
+    /* Destruyo el heap */
+    heap_destruir (heap , NULL);
+    printf ("El heap fue destruido\n");
+}
 
-/* Devuelve true si la cantidad de elementos que hay en el heap es 0, false en
- * caso contrario. */
-bool heap_esta_vacio(const heap_t *heap);
+static void prueba_heap_destruir_con_NULL (void){
+    printf ("\nINICIO DE PRUEBAS HEAP DESTRUIR CON FUNCION NULL\n");
+    /* Defino los recursos a utilizar */
+    heap_t* heap = heap_crear (comparar_cadenas);
+    char* cadena_1 = "prueba1";
+    char* cadena_2 = "prueba2";
+    char* cadena_3 = "prueba3";
+    char* cadena_4 = "prueba4";
+    char* cadena_5 = "prueba5";
+    char* cadena_6 = "prueba6";
 
-/* Agrega un elemento al heap. El elemento no puede ser NULL.
- * Devuelve true si fue una operación exitosa, o false en caso de error.
- * Pre: el heap fue creado.
- * Post: se agregó un nuevo elemento al heap.
- */
-bool heap_encolar(heap_t *heap, void *elem);
+    /* Inicio de pruebas */
+    print_test ("Encolar elemento 1" , heap_encolar (heap , cadena_1));
+    print_test ("Encolar elemento 2" , heap_encolar (heap , cadena_2));
+    print_test ("Encolar elemento 3" , heap_encolar (heap , cadena_3));
+    print_test ("Encolar elemento 4" , heap_encolar (heap , cadena_4));
+    print_test ("Encolar elemento 5" , heap_encolar (heap , cadena_5));
+    print_test ("Encolar elemento 6" , heap_encolar (heap , cadena_6));
 
-/* Devuelve el elemento con máxima prioridad. Si el heap esta vacío, devuelve
- * NULL.
- * Pre: el heap fue creado.
- */
-void *heap_ver_max(const heap_t *heap);
+    /* Destruyo el heap */
+    heap_destruir (heap , NULL);
+    print_test ("El heap fue destruido con elementos",true);
+}
 
-/* Elimina el elemento con máxima prioridad, y lo devuelve.
- * Si el heap esta vacío, devuelve NULL.
- * Pre: el heap fue creado.
- * Post: el elemento desencolado ya no se encuentra en el heap.
- */
-void *heap_desencolar(heap_t *heap);
+static void prueba_heap_destruir_con_free (void){
+    printf ("\nINICIO DE PRUEBAS HEAP DESTRUIR CON FUNCION FREE\n");
+    /* Defino los recursos a utilizar */
+    heap_t* heap = heap_crear (comparar_cadenas);
+    char* cadena_1 = malloc (5*sizeof (char));
+    cadena_1[0] = 'H'; cadena_1[1] = 'o'; cadena_1[2] = 'l'; cadena_1[3] = 'a'; cadena_1[4] = '\0';
+    char* cadena_2 = malloc (5*sizeof (char));
+    cadena_2[0] = 'C'; cadena_2[1] = 'a'; cadena_2[2] = 's'; cadena_2[3] = 'a'; cadena_2[4] = '\0';
+    char* cadena_3 = malloc (5*sizeof (char));
+    cadena_3[0] = 'P'; cadena_3[1] = 'e'; cadena_3[2] = 'r'; cadena_3[3] = 'a'; cadena_3[4] = '\0';
+
+    /* Inicio de pruebas */
+    print_test ("Encolar elemento" , heap_encolar(heap , cadena_1));
+    print_test ("Encolar elemento" , heap_encolar(heap , cadena_2));
+    print_test ("Encolar elemento" , heap_encolar(heap , cadena_3));
+
+    void (*puntero_free)() = &free;
+    heap_destruir (heap , puntero_free);
+    print_test ("El heap fue destruido con free" , true);
+}
+
+static void prueba_heapify (){
+    printf ("\nINICIO DE PRUEBAS HEAPIFY\n");
+    /* Defino los recursos a utilizar */
+    char* cadena_1 = "A";
+    char* cadena_2 = "B";
+    char* cadena_3 = "C";
+    char* cadena_4 = "D";
+    void** arreglo = malloc (4*sizeof (char*));
+
+    arreglo[0] = cadena_2; arreglo[1]=cadena_3; arreglo[2] = cadena_1; arreglo[3]=cadena_4;
+    heap_t* heap = heap_crear_arr (arreglo , 4 , comparar_cadenas);
+
+    /* Inicio de pruebas */
+    print_test ("Verifico maximo" , heap_ver_max(heap)==cadena_4);
+    print_test ("Desencolar" , heap_desencolar(heap)==cadena_4);
+    print_test ("Verifico maximo" , heap_ver_max(heap)==cadena_3);
+    print_test ("Desencolar" , heap_desencolar(heap)==cadena_3);
+    print_test ("Verifico maximo" , heap_ver_max(heap)==cadena_2);
+    print_test ("Desencolar" , heap_desencolar(heap)==cadena_2);
+    print_test ("Verifico maximo" , heap_ver_max(heap)==cadena_1);
+    print_test ("Desencolar" , heap_desencolar(heap)==cadena_1);
 
 
-void pruebas_heap_estudiante(void);
+    /* Destruyo el heap */
+    heap_destruir (heap , NULL);
+    free (arreglo);
+    printf ("El heap fue destruido\n");
+}
 
-#endif  // HEAP_H
+static void prueba_heapsort (void){
+    printf ("\nINICIO DE PRUEBAS HEAP-SORT\n");
+    /* Defino los recursos a utilizar */
+    char* cadena_1 = "A";
+    char* cadena_2 = "B";
+    char* cadena_3 = "C";
+    char* cadena_4 = "D";
+    void** arreglo = malloc (4*sizeof (char*));
+    arreglo[0] = cadena_2; arreglo[1]=cadena_3; arreglo[2] = cadena_1; arreglo[3]=cadena_4;
+    heap_sort (arreglo , 4 , comparar_cadenas);
+
+    /* Inicio de pruebas */
+    print_test ("Verifico elemento 1" , arreglo[0] == cadena_1);
+    print_test ("Verifico elemento 2" , arreglo[1] == cadena_2);
+    print_test ("Verifico elemento 3" , arreglo[2] == cadena_3);
+    print_test ("Verifico elemento 4" , arreglo[3] == cadena_4);
+
+    /* Librero el arreglo */
+    free(arreglo);
+    print_test ("El arreglo fue liberado" , true);
+}
+
+
+void pruebas_heap_estudiante(void){
+    prueba_heap_vacio();
+    prueba_heap_encolar_en_orden();
+    prueba_heap_encolar_desordenado();
+    prueba_heap_desencolar();
+    prueba_heap_destruir_con_NULL ();
+    prueba_heap_destruir_con_free ();
+    prueba_heapify ();
+    prueba_heapsort();
+}

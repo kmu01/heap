@@ -5,6 +5,7 @@
 
 void pruebas_heap_catedra(void);
 void pruebas_heap_volumen_catedra(size_t, bool);
+void pruebas_heap_estudiante(void);
 
 /* ******************************************************************
  *                        PROGRAMA PRINCIPAL
