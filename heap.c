@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #define TAM_INICIAL 500
 
-struct heap{  //En este caso trabajamos con un heap de minimos.
+struct heap{
     void** datos;
     size_t cant;
     size_t tam;
