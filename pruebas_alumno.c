@@ -257,12 +257,38 @@ static void prueba_heapsort (void){
     print_test ("El arreglo fue liberado" , true);
 }
 
+void prueba_heap_volumen(size_t largo){
+    printf ("\nINICIO DE PRUEBAS DE VOLUMEN\n");
+    heap_t *heap = heap_crear(comparar_enteros);
+    int vec_aux[largo];
+    bool todo_bien = true;
+    for(int i = 0; i < largo; i++){
+        vec_aux[i] = (i + 1);
+        if (!heap_encolar(heap, &vec_aux[i])){
+            todo_bien = false;
+            break;
+        }
+    }
+    print_test("Verifico si se encolaron correctamente", (heap_cantidad(heap) == largo) && todo_bien);
+    todo_bien = true;
+    for(int i = 0; i < largo; i++){
+        int *valor = heap_desencolar(heap);
+        if(*valor != largo - i){
+            todo_bien = false;
+            break;
+        }
+    }
+    print_test("Verifico que se desencolaron correctamente", todo_bien && heap_esta_vacio(heap));
+    heap_destruir(heap, NULL);
+    print_test("El heap fue destruido", true);
+}
 
 void pruebas_heap_estudiante(void){
     prueba_heap_vacio();
     prueba_heap_encolar_en_orden();
     prueba_heap_encolar_desordenado();
     prueba_heap_desencolar();
+    prueba_heap_volumen(1000);
     prueba_heap_destruir_con_NULL ();
     prueba_heap_destruir_con_free ();
     prueba_heapify ();
