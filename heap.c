@@ -1,53 +1,66 @@
 #include "heap.h"
 #include <stdio.h>
 #include <stdlib.h>
-#define TAM_INICIAL 1000
+#define TAM_INICIAL 500
 
-struct heap{  //En este caso trabajamos con un heap de minimos.
+struct heap{
     void** datos;
     size_t cant;
     size_t tam;
     cmp_func_t cmp;
-}; 
+};
 
 // ----------------- AUXILIARES ----------------- 
 
-void swap(void* primero, void* segundo){
-    void* aux = primero;
-    primero = segundo;
-    segundo = aux;
+void swap(void** datos , size_t primero, size_t segundo){
+    void* aux = datos[primero];
+    datos[primero] = datos[segundo];
+    datos[segundo] = aux;
 }
-
 
 void upheap(void** datos, size_t hijo, cmp_func_t cmp){
     if (hijo == 0) return;
     size_t padre = (hijo - 1) / 2;
-    if (cmp(datos[hijo], datos[padre]) < 0) return; 
-    swap(datos[hijo], datos[padre]);
-    upheap(datos, padre, cmp);
+    if (cmp(datos[hijo], datos[padre]) > 0){
+        swap(datos,hijo, padre);
+        upheap(datos, padre, cmp);
+    }
 }
 
-size_t minimo(void** datos, cmp_func_t cmp, size_t padre, size_t h_izq, size_t h_der){
-    size_t min;
+
+size_t maximo(void** datos, cmp_func_t cmp, size_t padre, size_t h_izq, size_t h_der){
+    size_t max;
     if (cmp(datos[h_der], datos[h_izq]) < 0){
-        min = h_der;
+        max = h_izq;
     } else{
-        min = h_izq;
+        max = h_der;
     }
-    if (cmp(datos[padre], datos[min]) < 0) min = padre;
-    return min;
+    if (cmp(datos[padre], datos[max]) >= 0){
+        max = padre;
+    }
+    return max;
 }
 
 void downheap(void** datos, size_t cant, size_t padre, cmp_func_t cmp){
-    if (padre >= cant) return;
-    size_t h_izq = (padre * 2) + 1;
-    size_t h_der = (padre * 2) + 2;
-    size_t min = minimo(datos, cmp, padre, h_izq, h_der);
-    if (min != padre){
-        swap(datos[padre], datos[min]);
-        downheap(datos, cant, min, cmp);
+    if (padre >= (cant)){
+        return;
+    }
+    size_t h_izq = (padre * 2) + 1; 
+    size_t h_der = (padre * 2) + 2; 
+    size_t max;
+    if (h_izq >= cant && h_der >= cant) return;
+    if (h_der >= cant){
+        max = maximo (datos, cmp, padre , h_izq , h_izq);
+    }
+    else{
+        max = maximo(datos, cmp, padre, h_izq, h_der);
+    }
+    if (max != padre){
+        swap(datos , padre , max);
+        downheap(datos, cant, max, cmp);
     }
 }
+
 
 /*
  * Función que le da forma de heap a un arreglo de n elementos.
@@ -68,7 +81,7 @@ void heapify(void** datos, size_t cant, cmp_func_t cmp){
 void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp){
     heapify(elementos, cant, cmp);
     for (size_t i = cant-1; i > 0; i--){
-        swap(elementos[0], elementos[i]);
+        swap( elementos , 0 , i);
         downheap(elementos, i, 0, cmp);
     }
 }
@@ -116,7 +129,7 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
 }
 
 /* Elimina el heap, llamando a la función dada para cada elemento del mismo.
- * El puntero a la función puede ser NULL, en cuyo caso no se llamará.
+ * El puntero a la minimosfunción puede ser NULL, en cuyo caso no se llamará.
  * Post: se llamó a la función indicada con cada elemento del heap. El heap
  * dejó de ser válido. */
 void heap_destruir(heap_t *heap, void (*destruir_elemento)(void *e)){
@@ -144,7 +157,14 @@ bool heap_esta_vacio(const heap_t *heap){
  * Post: se agregó un nuevo elemento al heap.
  */
 bool heap_encolar(heap_t *heap, void *elem){
-    //Agregar funcion de redimension.
+    if (heap->cant+1 >= heap->tam){
+        void** aux = realloc (heap->datos , (2*heap->cant)*sizeof (void*));
+        if (aux == NULL){
+            return false;
+        }
+        heap->datos = aux;
+        heap->tam = heap->tam * 2;
+    }
     heap->datos[heap->cant] = elem;
     upheap(heap->datos, heap->cant, heap->cmp);
     heap->cant++;
@@ -156,7 +176,7 @@ bool heap_encolar(heap_t *heap, void *elem){
  * Pre: el heap fue creado.
  */
 void *heap_ver_max(const heap_t *heap){
-    if(heap_esta_vacio(heap)) return NULL;
+    if(heap_esta_vacio(heap))return NULL;
     return heap->datos[0];
 }
 
@@ -167,12 +187,14 @@ void *heap_ver_max(const heap_t *heap){
  */
 void *heap_desencolar(heap_t *heap){
     if(heap_esta_vacio(heap)) return NULL;
+    if ((heap->cant-1)<=(heap->tam / 4) && (heap->tam/2 > TAM_INICIAL)){
+        heap->datos = realloc(heap->datos , (heap->tam/2)*sizeof(void*));
+        heap->tam = heap->tam / 2;
+    }
     void* dato = heap_ver_max(heap);
-    heap->datos[0] = heap->datos[--heap->cant];
+    swap (heap->datos , 0 , heap->cant-1);
+    heap->cant --;
     downheap(heap->datos, heap->cant, 0, heap->cmp);
-    //Agregar funcion de redimension.
     return dato;
 }
-
-
 
