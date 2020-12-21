@@ -188,7 +188,7 @@ void *heap_ver_max(const heap_t *heap){
 void *heap_desencolar(heap_t *heap){
     if(heap_esta_vacio(heap)) return NULL;
     if ((heap->cant-1)<=(heap->tam / 4) && (heap->tam/2 > TAM_INICIAL)){
-        heap->datos = realloc(heap->datos , (heap->tam/2)*sizeof(void*));
+    heap->datos = realloc(heap->datos , (heap->tam/2)*sizeof(void*));
         heap->tam = heap->tam / 2;
     }
     void* dato = heap_ver_max(heap);
