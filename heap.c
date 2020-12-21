@@ -158,7 +158,7 @@ bool heap_esta_vacio(const heap_t *heap){
  */
 bool heap_encolar(heap_t *heap, void *elem){
     if (heap->cant+1 >= heap->tam){
-        void** aux = realloc (heap->datos , (2*heap->cant)*sizeof (void*));
+        void** aux = realloc (heap->datos , (2*heap->tam)*sizeof (void*));
         if (aux == NULL){
             return false;
         }
