@@ -11,13 +11,12 @@ void pruebas_heap_estudiante(void);
  *                        PROGRAMA PRINCIPAL
  * *****************************************************************/
 
+#ifdef CORRECTOR
 int main(int argc, char *argv[]) {
     if (argc < 2) {
         printf("~~~ PRUEBAS ESTUDIANTE ~~~\n");
         pruebas_heap_estudiante();
     }
-
-    #ifdef CORRECTOR
         if (argc > 1) {
             // Asumimos que nos están pidiendo pruebas de volumen.
             long largo = strtol(argv[1], NULL, 10);
@@ -26,7 +25,7 @@ int main(int argc, char *argv[]) {
         }
         printf("\n~~~ PRUEBAS CÁTEDRA ~~~\n");
         pruebas_heap_catedra();
-    #endif
 
     return failure_count() > 0;
 }
+#endif
